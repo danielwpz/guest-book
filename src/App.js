@@ -5,12 +5,29 @@ import Big from 'big.js';
 import Form from './components/Form';
 import SignIn from './components/SignIn';
 import Messages from './components/Messages';
+import { utils } from 'near-api-js'
 
 const SUGGESTED_DONATION = '0';
 const BOATLOAD_OF_GAS = Big(3).times(10 ** 13).toFixed();
 
 const App = ({ contract, currentUser, nearConfig, wallet }) => {
   const [messages, setMessages] = useState([]);
+  const [totalDonation, setTotalDonation] = useState('0');
+
+  // try get totalDonation
+  if (currentUser) {
+    contract.getDonation({
+      accountId: currentUser.accountId
+    })
+    .then(donation => {
+      setTotalDonation(utils.format.formatNearAmount(donation))
+      console.log('donation', donation)
+    })
+    .catch(err => {
+      console.log('get donation failed:')
+      console.log(err)
+    })
+  }
 
   useEffect(() => {
     // TODO: don't just fetch once; subscribe!
@@ -64,7 +81,7 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
         }
       </header>
       { currentUser
-        ? <Form onSubmit={onSubmit} currentUser={currentUser} />
+        ? <Form onSubmit={onSubmit} currentUser={currentUser} totalDonation={ totalDonation } />
         : <SignIn/>
       }
       { !!currentUser && !!messages.length && <Messages messages={messages}/> }

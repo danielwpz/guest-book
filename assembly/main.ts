@@ -1,9 +1,12 @@
+import { context, PersistentMap, u128 } from 'near-sdk-as';
 import { PostedMessage, messages } from './model';
 
 // --- contract code goes below
 
 // The maximum number of latest messages the contract returns.
 const MESSAGE_LIMIT = 10;
+
+const donationSum = new PersistentMap<string, u128>('donation')
 
 /**
  * Adds a new message under the name of the sender's account id.\
@@ -15,6 +18,13 @@ export function addMessage(text: string): void {
   const message = new PostedMessage(text);
   // Adding the message to end of the the persistent collection
   messages.push(message);
+  // Add donation to donationSum
+  let existingDonations = new u128(0) 
+  const sender = context.predecessor
+  if (donationSum.contains(sender)) {
+    existingDonations = donationSum.getSome(sender)
+  }
+  donationSum.set(sender, u128.add(existingDonations, context.attachedDeposit))
 }
 
 /**
@@ -29,4 +39,12 @@ export function getMessages(): PostedMessage[] {
     result[i] = messages[i + startIndex];
   }
   return result;
+}
+
+export function getDonation(accountId: string): u128 {
+  let result = new u128(0)
+  if (donationSum.contains(accountId)) {
+    result = donationSum.getSome(accountId)
+  }
+  return result
 }

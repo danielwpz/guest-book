@@ -36,6 +36,7 @@
   "dependencies": {
     "big.js": "^6.1.1",
     "env-cmd": "^10.1.0",
+    "ne": "^0.0.28",
     "near-api-js": "^0.41.0",
     "prop-types": "^15.7.2",
     "react": "^17.0.2",
@@ -43,7 +44,7 @@
     "regenerator-runtime": "^0.13.7"
   },
   "resolutions": {
-     "@babel/preset-env": "7.13.8"
+    "@babel/preset-env": "7.13.8"
   },
   "jest": {
     "projects": [
